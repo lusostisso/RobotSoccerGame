@@ -70,6 +70,7 @@ cpTransformMult(cpTransform t1, cpTransform t2)
 }
 
 /// Transform an absolute point. (i.e. a vertex)
+
 static inline cpVect
 cpTransformPoint(cpTransform t, cpVect p)
 {
