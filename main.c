@@ -8,7 +8,9 @@
 // Funções para movimentação de objetos
 void moveRobo(cpBody* body, void* data);
 void moveBola(cpBody* body, void* data);
-void moveAtacante(cpBody* body, void* data); 
+void moveGoleiroEsquerda(cpBody* body, void* data);
+void moveGoleiroDireita(cpBody* body, void* data);
+void moveAtacanteEsquerda(cpBody* body, void* data);
 
 // Prototipos
 void initCM();
@@ -31,13 +33,25 @@ cpVect gravity;
 cpSpace* space;
 
 // Paredes "invisíveis" do ambiente
-cpShape* leftWall, *rightWall, *topWall, *bottomWall;
+cpShape* leftWall, *rightWall, *topWall, *bottomWall, *goleiraDireitaCima, *goleiraDireiraBaixo, *goleiraEsquerdaCima, *goleiraEsquerdaBaixo;
 
 // A bola
 cpBody* ballBody;
 
 // Um robô
 cpBody* robotBody;
+
+// Jogadores time amora
+cpBody* goleiroAmora, *defensorAmora, *atacanteAmora;
+
+// Jogadores time framboesa
+cpBody* goleiroFramboesa, *defensorFramboesa, *atacanteFramboesa;
+
+//Variaveis global de coordenadas time amora
+cpVect goleiroAmora_coordenada, defensorAmora_coordenada, atacanteAmora_coordenada;
+
+//Variaveis global de coordenadas time framboesa
+cpVect goleiroFramboesa_coordenada, defensorFramboesa_coordenada, atacanteFramboesa_coordenada;
 
 // Cada passo de simulação é 1/60 seg.
 cpFloat timeStep = 1.0/60.0;
@@ -52,7 +66,7 @@ void initCM()
     space = cpSpaceNew();
 
     // Seta o fator de damping, isto é, de atrito do ar
-    cpSpaceSetDamping(space, 0.8);
+    cpSpaceSetDamping(space, 0.8); //colocaram 1 no outro
 
     // Descomente a linha abaixo se quiser ver o efeito da gravidade!
     //cpSpaceSetGravity(space, gravity);
@@ -62,6 +76,10 @@ void initCM()
     rightWall  = newLine(cpv(LARGURA_JAN,0), cpv(LARGURA_JAN,ALTURA_JAN), 0, 1.0);
     bottomWall = newLine(cpv(0,0), cpv(LARGURA_JAN,0), 0, 1.0);
     topWall    = newLine(cpv(0,ALTURA_JAN), cpv(LARGURA_JAN,ALTURA_JAN), 0, 1.0);
+    goleiraDireitaCima = newLine(cpv(976,325), cpv(LARGURA_JAN, 326), 0, 1.0);
+    goleiraDireiraBaixo = newLine(cpv(976,386), cpv(LARGURA_JAN, 386), 0, 1.0);
+    goleiraEsquerdaCima = newLine(cpv(0,325), cpv(47, 326), 0, 1.0);
+    goleiraEsquerdaBaixo = newLine(cpv(0,386), cpv(77, 386), 0, 1.0);
 
     // Agora criamos a bola...
     // Os parâmetros são:
@@ -74,9 +92,109 @@ void initCM()
     //   - coeficiente de elasticidade
     ballBody = newCircle(cpv(512,350), 8, 1, "small_football.png", moveBola, 0.2, 1);
 
+    goleiroFramboesa_coordenada = cpv(100,356);
+    goleiroAmora_coordenada = cpv(924,356);
+
+
     // ... e um robô de exemplo
-    robotBody = newCircle(cpv(50,350), 20, 5, "ship1.png", moveRobo, 0.2, 0.5);
+    //robotBody = newCircle(cpv(50,350), 20, 5, "ship1.png", moveRobo, 0.2, 1);
+
+    goleiroAmora = newCircle(goleiroFramboesa_coordenada, 15, 5, "monkey.png", moveGoleiroEsquerda, 0.2, 0);
+    goleiroFramboesa = newCircle(goleiroAmora_coordenada, 15, 5, "monkey.png", moveGoleiroDireita, 0.2, 0);
+
+    atacanteAmora = newCircle(cpv(200,717), 15, 5, "monkey.png", moveAtacanteEsquerda, 0.2, 0);
+    
+    /*
+    defensorAmora = newCircle(cpv(256,180), 20, 5, "ship3.png", moveZagueiroEsquerda1, 0.2, 0);
+    atacanteAmora = newCircle(cpv(440,317), 20, 5, "ship3.png", moveZagueiroEsquerda2, 0.2, 0);
+    
+    goleiroFramboesa = newCircle(cpv(924,356), 20, 5, "ship1.png", moveGoleiroDireita, 0.2, 0);
+    defensorFramboesa = newCircle(cpv(770,180), 20, 5, "ship3.png", moveZagueiroDireita1, 0.2, 0);
+    atacanteFramboesa = newCircle(cpv(585,317), 20, 5, "ship3.png", moveZagueiroDireita2, 0.2, 0);
+    */
+
     //robotBody = newCircle(cpv(50,350), 20, 5, "monkey.png", moveAtacante, 0.2, 0.5);
+}
+
+void moveGoleiroEsquerda(cpBody* body, void* data){
+    srand(time(0));
+
+    cpVect velocidade = cpvclamp(cpBodyGetVelocity(body), (5+(rand() % 11))); //Define a velocidade em um intervalo aleatório entre 5 e 15.
+    cpBodySetVelocity(body, velocidade);
+
+    cpVect robotPos = cpBodyGetPosition(body); 
+    cpVect ballPos  = cpBodyGetPosition(ballBody);
+
+    cpVect pos = robotPos;
+    pos.x = -robotPos.x;
+    pos.y = -robotPos.y;
+    cpVect delta = cpvadd(ballPos,pos);
+    delta = cpvmult(cpvnormalize(delta),20);
+
+    if(ballPos.x < 189 && ballPos.y < 533 && ballPos.y > 180){
+        cpBodyApplyImpulseAtWorldPoint(body, delta, robotPos);
+    } else{
+        cpVect deltaIni = cpvadd(goleiroFramboesa_coordenada,pos);
+        cpBodyApplyImpulseAtWorldPoint(body, deltaIni, goleiroFramboesa_coordenada);
+        if (fabs(robotPos.x - goleiroFramboesa_coordenada.x) < 0.1 && fabs(robotPos.y - goleiroFramboesa_coordenada.y) < 0.1){
+             cpBodySetVelocity(body, cpv(0,0));
+        }
+    }
+}
+
+void moveGoleiroDireita(cpBody* body, void* data){
+    srand(time(0));
+    cpVect vel = cpBodyGetVelocity(body);
+    vel = cpvclamp(vel, (5+(rand() % 11)));
+    cpBodySetVelocity(body, vel);
+
+    cpVect robotPos = cpBodyGetPosition(body);
+    cpVect ballPos  = cpBodyGetPosition(ballBody);
+
+    cpVect pos = robotPos;
+    pos.x = -robotPos.x;
+    pos.y = -robotPos.y;
+    cpVect delta = cpvadd(ballPos,pos);
+    delta = cpvmult(cpvnormalize(delta), 20);
+
+    if(ballPos.x > 835 && robotPos.y < 533 && robotPos.y > 180){
+        cpBodyApplyImpulseAtWorldPoint(body, delta, robotPos);
+    } else{
+        cpVect deltaIni = cpvadd(goleiroAmora_coordenada, pos);
+        cpBodyApplyImpulseAtWorldPoint(body, deltaIni, goleiroAmora_coordenada);
+        if (fabs(robotPos.x - goleiroAmora_coordenada.x) < 0.1 && fabs(robotPos.y - goleiroAmora_coordenada.y) < 0.1 ){
+             cpBodySetVelocity(body, cpv(0,0));
+        }
+    }
+}
+
+void moveAtacanteEsquerda(cpBody* body, void* data) {
+    cpVect vel = cpBodyGetVelocity(body);
+    srand(time(0));
+    vel = cpvclamp(vel, (5 + (rand() % 11)));
+    cpBodySetVelocity(body, vel);
+
+    cpVect robotPos = cpBodyGetPosition(body);
+    cpVect ballPos = cpBodyGetPosition(ballBody);
+
+    cpVect pos = robotPos;
+    pos.x = -robotPos.x;
+    pos.y = -robotPos.y;
+    cpVect delta = cpvadd(ballPos, pos);
+    delta = cpvmult(cpvnormalize(delta), 20);
+
+    cpFloat distance = cpvdist(robotPos, ballPos);
+
+    if (distance < 28) {
+        cpVect chute = cpvmult(cpvnormalize(cpvsub(goleiroAmora_coordenada, ballPos)), 10);
+        cpBodyApplyImpulseAtWorldPoint(ballBody, chute, ballPos);
+    }
+
+    if (ballPos.x > 430 && ballPos.y <= 356) {
+        cpBodyApplyImpulseAtWorldPoint(body, delta, robotPos);
+    } else {
+        cpBodySetVelocity(body, cpv(0,0));
+    }
 }
 
 // Exemplo de função de movimentação: move o robô em direção à bola
@@ -106,17 +224,21 @@ void moveRobo(cpBody* body, void* data)
     // Finalmente, aplica impulso no robô
     cpBodyApplyImpulseAtWorldPoint(body, delta, robotPos);
 }
-void moveAtacante (cpBody* body, void* data) {
 
-}
-
-// Exemplo: move a bola aleatoriamente
 void moveBola(cpBody* body, void* data)
 {
-    // Sorteia um impulso entre -10 e 10, para x e y
-    cpVect impulso = cpv(rand()%20-10,rand()%20-10);
-    // E aplica na bola
-    cpBodyApplyImpulseAtWorldPoint(body, impulso, cpBodyGetPosition(body));
+    cpVect ballPos  = cpBodyGetPosition(body);
+    if(ballPos.x < 45 && ballPos.y > 326 && ballPos.y < 386){
+        score2++;
+        cpBodySetPosition(body, cpv(512,350));
+        cpBodySetVelocity(body, cpv(0,0));
+    }
+
+    if(ballPos.x > 978 && ballPos.y > 326 && ballPos.y < 386){
+        score1++;
+        cpBodySetPosition(body, cpv(512,350));
+        cpBodySetVelocity(body, cpv(0,0));
+    }
 }
 
 // Libera memória ocupada por cada corpo, forma e ambiente
