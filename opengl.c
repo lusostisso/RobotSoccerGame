@@ -31,7 +31,7 @@ GLuint pitchTex;
 extern cpVect gravity;
 
 // Está aqui apenas para o teste de movimentação via teclado
-extern cpBody* robotBody;
+//extern cpBody* robotBody;
 
 // Opções para o debugdraw - não está sendo usado
 cpSpaceDebugDrawOptions drawOptions;
@@ -300,11 +300,12 @@ void keyboard( unsigned char key, int x, int y )
       cpSpaceSetGravity(space, grav);
       break;
   }
+  /*
   if(dx != 0 || dy != 0) {
       pos = cpBodyGetPosition(robotBody);
       cpBodyApplyImpulseAtWorldPoint(robotBody, cpv(dx,dy), cpv(pos.x,pos.y));
       glutPostRedisplay();
-  }
+  }*/
 }
 
 // Callback de mouse (se necessário)
