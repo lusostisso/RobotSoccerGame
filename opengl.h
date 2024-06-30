@@ -23,12 +23,23 @@
 // (tipo do ponteiro de função)
 typedef void (*bodyMotionFunc)(cpBody* body, void* data);
 
+typedef enum {
+    RIGHT,
+    LEFT
+} lado;
+
+typedef struct {
+    cpVect pos_inicial;
+    lado lado;
+} jogador_data;
+
 typedef struct
 {
     GLuint tex;
     cpFloat radius;
     cpShape* shape;
     bodyMotionFunc func;
+    jogador_data jogadorData; 
 } UserData;
 
 // Funções da interface gráfica e OpenGL
