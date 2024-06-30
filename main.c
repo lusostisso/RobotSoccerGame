@@ -55,7 +55,7 @@ cpShape* leftWall, *rightWall, *topWall, *bottomWall, *goleiraDireitaCima, *gole
 // A bola
 cpBody* ballBody;
 
-cpBody* goleiroDireita, *zagueiroDireita1, *zagueiroDireita2, *zagueiroDireita3, *atacanteDireita1, *atacanteDireita2, *goleiroEsquerda, *zagueiroEsquerda1, *zagueiroEsquerda2, *zagueiroEsquerda3, *atacanteEsquerda1, *atacanteEsquerda2;
+cpBody* goleiroDireita, *defensorDireita1, *defensorDireita2, *defensorDireita3, *atacanteDireita1, *atacanteDireita2, *goleiroEsquerda, *defensorEsquerda1, *defensorEsquerda2, *defensorEsquerda3, *atacanteEsquerda1, *atacanteEsquerda2;
 
 //Variaveis global de coordenadas time 1
 cpVect golEsq, defeEsq1, defeEsq2, defeEsq3, ataEsq1, ataEsq2, goleiraEsq, golDir, defeDir1, defeDir2, defeDir3, ataDir1, ataDir2, goleiraDir;
@@ -106,15 +106,15 @@ void initCM()
     ballBody = newCircle(centroDoCampo, 8, 1, "small_football.png", moveBola, 0.2, 1, init_jogador_data(centroDoCampo, LEFT));
 
     goleiroEsquerda = newCircle(golEsq, 11, 5, "rosa.png", moveGoleiro, 0.2, 2, init_jogador_data(golEsq, LEFT));
-    zagueiroEsquerda1 = newCircle(defeEsq1, 15, 5, "rosa.png", moveDefensor, 0.2, 0, init_jogador_data(defeEsq1, LEFT));
-    zagueiroEsquerda2 = newCircle(defeEsq2, 15, 5, "rosa.png", moveDefensor, 0.2, 0, init_jogador_data(defeEsq2, LEFT));
-    zagueiroEsquerda3 = newCircle(defeEsq3, 15, 5, "rosa.png", moveDefensor, 0.2, 0, init_jogador_data(defeEsq3, LEFT));
+    defensorEsquerda1 = newCircle(defeEsq1, 15, 5, "rosa.png", moveDefensor, 0.2, 0, init_jogador_data(defeEsq1, LEFT));
+    defensorEsquerda2 = newCircle(defeEsq2, 15, 5, "rosa.png", moveDefensor, 0.2, 0, init_jogador_data(defeEsq2, LEFT));
+    defensorEsquerda3 = newCircle(defeEsq3, 15, 5, "rosa.png", moveDefensor, 0.2, 0, init_jogador_data(defeEsq3, LEFT));
     atacanteEsquerda1 = newCircle(ataEsq1, 15, 5, "rosa.png", moveAtacante, 0.2, 0, init_jogador_data(ataEsq1, LEFT));
     atacanteEsquerda2 = newCircle(ataEsq2, 15, 5, "rosa.png", moveAtacante, 0.2, 0, init_jogador_data(ataEsq2, LEFT));
     goleiroDireita = newCircle(golDir, 11, 5, "branco.png", moveGoleiro, 0.2, 2, init_jogador_data(golDir, RIGHT));
-    zagueiroDireita1= newCircle(defeDir1, 15, 5, "branco.png", moveDefensor, 0.2, 0, init_jogador_data(defeDir1, RIGHT));
-    zagueiroDireita2= newCircle(defeDir2, 15, 5, "branco.png", moveDefensor, 0.2, 0, init_jogador_data(defeDir2, RIGHT));
-    zagueiroDireita3= newCircle(defeDir3, 15, 5, "branco.png", moveDefensor, 0.2, 0, init_jogador_data(defeDir3, RIGHT));
+    defensorDireita1= newCircle(defeDir1, 15, 5, "branco.png", moveDefensor, 0.2, 0, init_jogador_data(defeDir1, RIGHT));
+    defensorDireita2= newCircle(defeDir2, 15, 5, "branco.png", moveDefensor, 0.2, 0, init_jogador_data(defeDir2, RIGHT));
+    defensorDireita3= newCircle(defeDir3, 15, 5, "branco.png", moveDefensor, 0.2, 0, init_jogador_data(defeDir3, RIGHT));
     atacanteDireita1= newCircle(ataDir1, 15, 5, "branco.png", moveAtacante, 0.2, 0, init_jogador_data(ataDir1, RIGHT));
     atacanteDireita2= newCircle(ataDir2, 15, 5, "branco.png", moveAtacante, 0.2, 0, init_jogador_data(ataDir2, RIGHT));
     pthread_create(&thread_id, NULL, isTheBallStuck, NULL);
@@ -133,15 +133,15 @@ void * isTheBallStuck(void *arg) {
 
 void resetPositionPlayers () {
     cpBodySetPosition(goleiroEsquerda, golEsq);
-    cpBodySetPosition(zagueiroEsquerda1, defeEsq1);
-    cpBodySetPosition(zagueiroEsquerda2, defeEsq2);
-    cpBodySetPosition(zagueiroEsquerda3, defeEsq3);
+    cpBodySetPosition(defensorEsquerda1, defeEsq1);
+    cpBodySetPosition(defensorEsquerda2, defeEsq2);
+    cpBodySetPosition(defensorEsquerda3, defeEsq3);
     cpBodySetPosition(atacanteEsquerda1, ataEsq1);
     cpBodySetPosition(atacanteEsquerda2, ataEsq2);
     cpBodySetPosition(goleiroDireita, golDir);
-    cpBodySetPosition(zagueiroDireita1, defeDir1);
-    cpBodySetPosition(zagueiroDireita2, defeDir2);
-    cpBodySetPosition(zagueiroDireita3, defeDir3);
+    cpBodySetPosition(defensorDireita1, defeDir1);
+    cpBodySetPosition(defensorDireita2, defeDir2);
+    cpBodySetPosition(defensorDireita3, defeDir3);
     cpBodySetPosition(atacanteDireita1, ataDir1);
     cpBodySetPosition(atacanteDireita2, ataDir2);
 
@@ -190,7 +190,7 @@ void moveGoleiro(cpBody* body, void* data){
     cpVect pos = robotPos;
     pos.x = -robotPos.x;
     pos.y = -robotPos.y;
-    cpVect delta = cpvmult(cpvnormalize(cpvadd(ballPos,pos)),20);
+    cpVect delta = cpvmult(cpvnormalize(cpvadd(ballPos,pos)), 20);
 
     cpVect posicao_goleira;
     int valor_grande_area;
@@ -255,10 +255,9 @@ void moveAtacante(cpBody* body, void* data) {
         aplicarImpulsoNaBola(posicao_goleira, ballPos);
     }
 
-    bool isLeft = (j.lado == LEFT);
-    cpBool isCloser = cpvdist(posicaoOutroAtacante, ballPos) > distanciaParaBola;
-
-    if ((isLeft && ballPos.x > 430) || (!isLeft && ballPos.x < 596)) {
+    bool isLeft = (j.lado == LEFT); 
+    cpBool isCloser = cpvdist(posicaoOutroAtacante, ballPos) > distanciaParaBola; 
+    if ((isLeft && ballPos.x > 422) || (!isLeft && ballPos.x < 602)) { 
         if (isCloser) {
             cpBodyApplyImpulseAtWorldPoint(body, delta, robotPos);
         }
@@ -296,7 +295,7 @@ void moveDefensor (cpBody* body, void* data){
     checkAndApplyBoundaryImpulse(body, data);
 
     cpVect vel = cpBodyGetVelocity(body);
-    vel = cpvclamp(vel, 30);
+    vel = cpvclamp(vel, 28);
     cpBodySetVelocity(body, vel);
     
     // Obtém a posição do robô e da bola...
@@ -344,7 +343,7 @@ void moveDefensor (cpBody* body, void* data){
 }
 
 void moveBola(cpBody* body, void* data){
-    cpVect velBola = cpvclamp(cpBodyGetVelocity(body), 55);
+    cpVect velBola = cpvclamp(cpBodyGetVelocity(body), 70);
     cpBodySetVelocity(body, velBola);
     cpVect ballPos  = cpBodyGetPosition(body);
     if(ballPos.x < 45 && ballPos.y > 326 && ballPos.y < 386){
@@ -375,17 +374,17 @@ void freeCM()
     cpShapeFree(ud->shape);
     cpBodyFree(goleiroDireita);
     free(ud);
-    ud = cpBodyGetUserData(zagueiroDireita1);
+    ud = cpBodyGetUserData(defensorDireita1);
     cpShapeFree(ud->shape);
-    cpBodyFree(zagueiroDireita1);
+    cpBodyFree(defensorDireita1);
     free(ud);
-    ud = cpBodyGetUserData(zagueiroDireita2);
+    ud = cpBodyGetUserData(defensorDireita2);
     cpShapeFree(ud->shape);
-    cpBodyFree(zagueiroDireita2);
+    cpBodyFree(defensorDireita2);
     free(ud);
-    ud = cpBodyGetUserData(zagueiroDireita3);
+    ud = cpBodyGetUserData(defensorDireita3);
     cpShapeFree(ud->shape);
-    cpBodyFree(zagueiroDireita3);
+    cpBodyFree(defensorDireita3);
     free(ud);
     ud = cpBodyGetUserData(atacanteDireita1);
     cpShapeFree(ud->shape);
@@ -400,17 +399,17 @@ void freeCM()
     cpShapeFree(ud->shape);
     cpBodyFree(goleiroDireita);
     free(ud);
-    ud = cpBodyGetUserData(zagueiroEsquerda1);
+    ud = cpBodyGetUserData(defensorEsquerda1);
     cpShapeFree(ud->shape);
-    cpBodyFree(zagueiroEsquerda1);
+    cpBodyFree(defensorEsquerda1);
     free(ud);
-    ud = cpBodyGetUserData(zagueiroEsquerda2);
+    ud = cpBodyGetUserData(defensorEsquerda2);
     cpShapeFree(ud->shape);
-    cpBodyFree(zagueiroEsquerda2);
+    cpBodyFree(defensorEsquerda2);
     free(ud);
-    ud = cpBodyGetUserData(zagueiroEsquerda3);
+    ud = cpBodyGetUserData(defensorEsquerda3);
     cpShapeFree(ud->shape);
-    cpBodyFree(zagueiroEsquerda3);
+    cpBodyFree(defensorEsquerda3);
     free(ud);
     ud = cpBodyGetUserData(atacanteEsquerda1);
     cpShapeFree(ud->shape);
